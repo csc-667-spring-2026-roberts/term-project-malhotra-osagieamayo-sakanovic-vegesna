@@ -6,10 +6,10 @@ CSC 667 Web Server Project — Spring 2026
 
 | Name | GitHub | Email |
 |------|--------|-------|
-| Vishrut Malhotra | @Agentwolf27 | vmalhotra@sfsu.edu |
-| Etinosa Osagie-Amayo | @preciouslrg | eosagieamayo@sfsu.edu |
-| Member 3 | @username | email@sfsu.edu |
-| Member 4 | @username | email@sfsu.edu |
+| Vishrut Malhotra     | @Agentwolf27   | vmalhotra@sfsu.edu    |
+| Etinosa Osagie-Amayo | @preciouslrg   | eosagieamayo@sfsu.edu |
+| Denis Sakanovic      | @swagking93    | dsakanovic@sfsu.edu   |
+| Member 4 | @username | email@sfsu.edu |                       |
 
 ## Requirements
 
