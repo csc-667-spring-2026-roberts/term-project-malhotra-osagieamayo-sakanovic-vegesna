@@ -24,9 +24,19 @@ CSC 667 Web Server Project — Spring 2026
 ```bash
 npm install
 cp .env.example .env
-# Edit .env to set AUTH_USER and AUTH_PASS (default: admin/secret)
+# Edit .env: set AUTH_USER, AUTH_PASS, and DATABASE_URL (see below)
 npm run dev
 ```
+
+### Database (Milestone 5)
+
+1. Install and start PostgreSQL locally.
+2. In `.env`, set `DATABASE_URL`, e.g. `postgresql://username:password@localhost:5432/your_db_name`.
+3. Create the demo table (for the test route):
+   ```sql
+   CREATE TABLE test_messages (id SERIAL PRIMARY KEY, message TEXT NOT NULL);
+   ```
+   Run this in `psql` or any PostgreSQL client against your database.
 
 ## Usage
 
