@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skip-Bo Project</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 420px; margin: 2rem auto; padding: 0 1.25rem; background: #fafafa; }
+    h1 { margin-bottom: 0.25rem; font-size: 1.75rem; }
+    .subtitle { color: #666; margin-bottom: 1.5rem; font-size: 0.95rem; }
+    form { margin-bottom: 1rem; }
+    label { display: block; margin-bottom: 0.25rem; font-weight: 500; font-size: 0.9rem; }
+    input { width: 100%; padding: 0.6rem 0.75rem; margin-bottom: 0.75rem; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; }
+    input:focus { outline: none; border-color: #333; }
+    button { padding: 0.6rem 1.25rem; cursor: pointer; background: #333; color: white; border: none; border-radius: 6px; font-size: 1rem; }
+    button:hover { background: #555; }
+    .error { color: #c00; margin-bottom: 1rem; padding: 0.5rem; background: #fee; border-radius: 4px; font-size: 0.9rem; }
+    .welcome { background: #fff; padding: 1.25rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .welcome p { margin: 0 0 1rem 0; }
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .tabs a { padding: 0.5rem 1rem; text-decoration: none; color: #333; border-radius: 6px; background: #eee; }
+    .tabs a:hover { background: #e0e0e0; }
+    .tabs a.active { background: #333; color: white; font-weight: 600; }
+    .panel { background: #fff; padding: 1.25rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .template-badge { font-size: 0.75rem; color: #999; margin-top: 2rem; }
+  </style>
+</head>
+<body>
+  <h1>Skip-Bo Project</h1>
+  <p class="subtitle">Express server with authentication (M6) and templating (M7)</p>
+
+<% if (user) { %>
+  <div class="welcome">
+    <p>Welcome, <strong><%= user.email %></strong>!</p>
+    <form action="/auth/logout" method="POST">
+      <button type="submit">Log Out</button>
+    </form>
+  </div>
+<% } else { %>
+  <% if (typeof error !== 'undefined' && error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+
+  <div class="tabs">
+    <a href="/?tab=login" class="<%= (typeof tab === 'undefined' || tab === 'login') ? 'active' : '' %>">Login</a>
+    <a href="/?tab=signup" class="<%= tab === 'signup' ? 'active' : '' %>">Sign Up</a>
+  </div>
+
+  <% if (typeof tab === 'undefined' || tab === 'login') { %>
+    <div class="panel active">
+      <form action="/auth/login" method="POST">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" name="email" required autocomplete="email">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" name="password" required autocomplete="current-password">
+        <button type="submit">Log In</button>
+      </form>
+    </div>
+  <% } else { %>
+    <div class="panel active">
+      <form action="/auth/register" method="POST">
+        <label for="signup-email">Email</label>
+        <input type="email" id="signup-email" name="email" required autocomplete="email">
+        <label for="signup-password">Password (min 8 characters)</label>
+        <input type="password" id="signup-password" name="password" required minlength="8" autocomplete="new-password">
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
+  <% } %>
+<% } %>
+
+  <p class="template-badge">M7: Server-rendered with EJS</p>
+</body>
+</html>

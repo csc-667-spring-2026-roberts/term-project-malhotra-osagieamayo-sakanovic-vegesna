@@ -1,49 +1,86 @@
 import express from "express";
+import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import testDbRouter from "./routes/testDb.js";
+import authRouter from "./routes/auth.js";
 import db from "./db/connection.js";
-
 
 // load variables from .env
 dotenv.config();
 
+const SESSION_SECRET = process.env["SESSION_SECRET"];
+if (!SESSION_SECRET) {
+  throw new Error("SESSION_SECRET is not set in .env");
+}
+
+const PgSession = connectPgSimple(session);
+
 // recreating __dirname because ES modules decided to remove it for some reason
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const publicDir = path.resolve(__dirname, "..", "public"); // figure out where the public folder is
-// start express application
+const publicDir = path.resolve(__dirname, "..", "public");
+const viewsDir = path.resolve(__dirname, "..", "views");
+
 const app = express();
+
+// M7: EJS templating
+app.set("view engine", "ejs");
+app.set("views", viewsDir);
 
 app.use(express.json()); // allows server to read JSON requests
 app.use(express.urlencoded({ extended: true })); // allows reading form submissions
 // extended:true just lets it handle more complex objects i think
 
-app.use(express.static(publicDir)); // serve static files /public
+// M6: Session with PostgreSQL store (sessions survive server restart)
+app.use(
+  session({
+    store: new PgSession({
+      pgPromise: db,
+      createTableIfMissing: true,
+    }),
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env["NODE_ENV"] === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    },
+  }),
+);
 
-app.get("/", (_req, res) => { // route root
-  res.type("text/plain").send("Skip-Bo server running");
+// M7: Server-rendered homepage (before static so / uses template, not index.html)
+app.get("/", (req, res) => {
+  const user = req.session.userId && req.session.email ? { email: req.session.email } : null;
+  const tab = typeof req.query.tab === "string" ? req.query.tab : "login";
+  const error = req.query.error as string | undefined;
+  res.render("home", { user, tab, error });
 });
 
-app.get("/api/health", (_req, res) => { // health check route
+app.use(express.static(publicDir));
+
+app.get("/api/health", (_req, res) => {
+  // health check route
   res.json({ status: "ok" });
 });
 
 app.use("/", testDbRouter); // we are plugging in our test database router
+app.use("/auth", authRouter); // M6: auth routes (register, login, logout)
 
 // optional database connection check when the server starts
 // basically just making sure postgres actually connects
+/* eslint-disable @typescript-eslint/no-floating-promises -- fire-and-forget startup check */
 db.connect()
   .then((obj) => {
     console.log("Connected to PostgreSQL successfully");
-    // release connection back to the pool
     obj.done();
   })
-  .catch((error) => {
-    // check err if databse dies
+  .catch((error: unknown) => {
     console.error("Database connection failed:", error);
   });
+/* eslint-enable @typescript-eslint/no-floating-promises */
 
 export default app;
-
-
