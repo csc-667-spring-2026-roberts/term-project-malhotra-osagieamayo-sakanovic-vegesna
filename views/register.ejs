@@ -1,0 +1,20 @@
+<%- include('partials/head', { title: 'Register — Skip-Bo Project' }) %>
+  <h1>Create account</h1>
+  <p class="subtitle">Skip-Bo Project — Express + sessions + EJS</p>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+
+  <div class="panel">
+    <form action="/auth/register" method="POST">
+      <label for="signup-email">Email</label>
+      <input type="email" id="signup-email" name="email" required autocomplete="email">
+      <label for="signup-password">Password (min 8 characters)</label>
+      <input type="password" id="signup-password" name="password" required minlength="8" autocomplete="new-password">
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <p class="nav-links">Already have an account? <a href="/login">Log in</a></p>
+<%- include('partials/footer') %>

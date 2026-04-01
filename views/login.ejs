@@ -1,0 +1,20 @@
+<%- include('partials/head', { title: 'Log In — Skip-Bo Project' }) %>
+  <h1>Log In</h1>
+  <p class="subtitle">Skip-Bo Project — Express + sessions + EJS</p>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+
+  <div class="panel">
+    <form action="/auth/login" method="POST">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" name="email" required autocomplete="email">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" name="password" required autocomplete="current-password">
+      <button type="submit">Log In</button>
+    </form>
+  </div>
+
+  <p class="nav-links">No account? <a href="/register">Register</a></p>
+<%- include('partials/footer') %>

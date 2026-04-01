@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import testDbRouter from "./routes/testDb.js";
 import authRouter from "./routes/auth.js";
+import { requireAuth } from "./middleware/auth.js";
+import { gravatarUrl } from "./utils/gravatar.js";
 import db from "./db/connection.js";
 
 // load variables from .env
@@ -52,12 +54,39 @@ app.use(
   }),
 );
 
-// M7: Server-rendered homepage (before static so / uses template, not index.html)
+// M7: Server-rendered pages (before static)
 app.get("/", (req, res) => {
-  const user = req.session.userId && req.session.email ? { email: req.session.email } : null;
-  const tab = typeof req.query.tab === "string" ? req.query.tab : "login";
-  const error = req.query.error as string | undefined;
-  res.render("home", { user, tab, error });
+  if (req.session.userId !== undefined) {
+    res.redirect("/lobby");
+  } else {
+    res.redirect("/login");
+  }
+});
+
+app.get("/login", (req, res) => {
+  if (req.session.userId !== undefined) {
+    res.redirect("/lobby");
+    return;
+  }
+  const error = typeof req.query.error === "string" ? req.query.error : undefined;
+  res.render("login", { error });
+});
+
+app.get("/register", (req, res) => {
+  if (req.session.userId !== undefined) {
+    res.redirect("/lobby");
+    return;
+  }
+  const error = typeof req.query.error === "string" ? req.query.error : undefined;
+  res.render("register", { error });
+});
+
+app.get("/lobby", requireAuth, (req, res) => {
+  const email = req.session.email ?? "";
+  res.render("lobby", {
+    user: { id: req.session.userId, email },
+    gravatarUrl: gravatarUrl(email),
+  });
 });
 
 app.use(express.static(publicDir));

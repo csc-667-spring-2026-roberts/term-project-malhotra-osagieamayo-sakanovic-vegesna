@@ -1,0 +1,17 @@
+<%- include('partials/head', { title: 'Lobby — Skip-Bo Project' }) %>
+  <h1>Lobby</h1>
+  <p class="subtitle">You are signed in.</p>
+
+  <div class="panel">
+    <div class="lobby-user">
+      <img src="<%= gravatarUrl %>" width="120" height="120" alt="">
+      <div>
+        <p><strong>Email</strong><br><%= user.email %></p>
+        <p style="margin: 0.75rem 0 0 0; font-size: 0.85rem; color: #666;">User ID: <%= user.id %></p>
+      </div>
+    </div>
+    <form action="/auth/logout" method="POST">
+      <button type="submit">Log Out</button>
+    </form>
+  </div>
+<%- include('partials/footer') %>
