@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import testDbRouter from "./routes/testDb.js";
 import authRouter from "./routes/auth.js";
-import { requireAuth } from "./middleware/auth.js";
+import { requireAuth, requireAuthApi } from "./middleware/auth.js";
 import { gravatarUrl } from "./utils/gravatar.js";
 import db from "./db/connection.js";
 
@@ -22,10 +22,23 @@ const PgSession = connectPgSimple(session);
 
 // recreating __dirname because ES modules decided to remove it for some reason
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const publicDir = path.resolve(__dirname, "..", "public");
-const viewsDir = path.resolve(__dirname, "..", "views");
+const projectRoot = path.resolve(__dirname, "..");
+const publicDir = path.join(projectRoot, "public");
+const viewsDir = path.join(projectRoot, "views");
 
 const app = express();
+
+// M8: Live reload in development (dynamic import so production can omit devDependencies)
+if (process.env["NODE_ENV"] !== "production") {
+  const [{ default: connectLivereload }, { default: livereload }] = await Promise.all([
+    import("connect-livereload"),
+    import("livereload"),
+  ]);
+  const lr = livereload.createServer({ delay: 150 });
+  lr.watch(publicDir);
+  lr.watch(viewsDir);
+  app.use(connectLivereload());
+}
 
 // M7: EJS templating
 app.set("view engine", "ejs");
@@ -86,6 +99,15 @@ app.get("/lobby", requireAuth, (req, res) => {
   res.render("lobby", {
     user: { id: req.session.userId, email },
     gravatarUrl: gravatarUrl(email),
+  });
+});
+
+/** M8: JSON for client-side fetch (session cookie sent automatically). */
+app.get("/api/session", requireAuthApi, (req, res) => {
+  const email = req.session.email ?? "";
+  res.json({
+    email,
+    serverTime: new Date().toISOString(),
   });
 });
 

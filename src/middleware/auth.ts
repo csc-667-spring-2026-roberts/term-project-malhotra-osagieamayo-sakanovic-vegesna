@@ -11,3 +11,12 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
     res.redirect("/login");
   }
 }
+
+/** M8: Protected JSON routes — fetch() must not receive an HTML login redirect. */
+export function requireAuthApi(req: Request, res: Response, next: NextFunction): void {
+  if (req.session.userId !== undefined) {
+    next();
+  } else {
+    res.status(401).json({ error: "Authentication required" });
+  }
+}

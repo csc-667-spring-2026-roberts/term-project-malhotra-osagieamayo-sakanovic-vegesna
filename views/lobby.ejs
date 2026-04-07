@@ -13,5 +13,17 @@
     <form action="/auth/logout" method="POST">
       <button type="submit">Log Out</button>
     </form>
+
+    <hr style="margin: 1.25rem 0; border: none; border-top: 1px solid #ddd;">
+    <p class="subtitle" style="margin-bottom: 0.5rem;">M8: client-side fetch</p>
+    <button type="button" id="load-session-btn">Load session from server</button>
+    <div id="activity-output" style="margin-top: 0.75rem;"></div>
+    <template id="activity-row-template">
+      <div class="panel" style="margin-top: 0.5rem;">
+        <p data-field="message"></p>
+        <p data-field="time" style="font-size: 0.85rem; color: #666; margin: 0;"></p>
+      </div>
+    </template>
   </div>
+  <script defer src="/js/lobby.js"></script>
 <%- include('partials/footer') %>
